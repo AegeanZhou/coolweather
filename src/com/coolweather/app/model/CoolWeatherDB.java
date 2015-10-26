@@ -13,7 +13,7 @@ import com.coolweather.app.db.CoolWeatherOpenHelper;
 public class CoolWeatherDB {
 	private String DBName = "CoolWeatherDB";
 	public static final int VERSION = 1;
-	private CoolWeatherDB coolWeatherDB;
+	private static CoolWeatherDB coolWeatherDB;
 	private SQLiteDatabase db;
 
 	/*
@@ -28,7 +28,7 @@ public class CoolWeatherDB {
 	/*
 	 * 获取CoolWeather实例
 	 */
-	public CoolWeatherDB getInstance(Context context) {
+	public synchronized static CoolWeatherDB getInstance(Context context) {
 		if (coolWeatherDB == null) {
 			coolWeatherDB = new CoolWeatherDB(context);
 		}
@@ -41,7 +41,7 @@ public class CoolWeatherDB {
 	public void saveProvince(Province province) {
 		if (province != null) {
 			ContentValues values = new ContentValues();
-			values.put("province_name", province.getProvinceCode());
+			values.put("province_name", province.getProvinceName());
 			values.put("province_code", province.getProvinceCode());
 			db.insert("province", null, values);
 		}
@@ -77,31 +77,32 @@ public class CoolWeatherDB {
 	 * 保存city实例信息到数据库
 	 */
 	public void saveCity(City city) {
-		ContentValues value = new ContentValues();
-		value.put("id", city.getId());
-		value.put("city_name", city.getCityName());
-		value.put("city_code", city.getCityCode());
-		value.put("province_id", city.getProvinceId());
-		db.insert("city", null, value);
+		if (city != null) {
+			ContentValues value = new ContentValues();
+			value.put("city_name", city.getCityName());
+			value.put("city_code", city.getCityCode());
+			value.put("province_id", city.getProvinceId());
+			db.insert("city", null, value);
+		}
 	}
 
 	/*
 	 * 从数据库读取城市信息
 	 */
 
-	public List<City> loadCities() {
-		City city = new City();
+	public List<City> loadCities(int provinceId) {
 		List<City> citiesList = new ArrayList<City>();
-		Cursor cursor = db.query("city", null, null, null, null, null, null);
+		Cursor cursor = db.query("city", null, "province_id = ?",
+				new String[] { String.valueOf(provinceId) }, null, null, null);
 		if (cursor.moveToFirst()) {
 			do {
+				City city = new City();
 				city.setId(cursor.getInt(cursor.getColumnIndex("id")));
 				city.setCityName(cursor.getString(cursor
 						.getColumnIndex("city_name")));
 				city.setCityCode(cursor.getString(cursor
 						.getColumnIndex("city_code")));
-				city.setProvinceId(cursor.getInt(cursor
-						.getColumnIndex("province_id")));
+				city.setProvinceId(provinceId);
 				citiesList.add(city);
 			} while (cursor.moveToNext());
 		}
@@ -116,29 +117,32 @@ public class CoolWeatherDB {
 	 */
 
 	public void saveCounty(County county) {
-		ContentValues value = new ContentValues();
-		value.put("id", county.getId());
-		value.put("county_name", county.getCountyName());
-		value.put("county_Code", county.getCountyCode());
-		value.put("city_id", county.getCityId());
-		db.insert("county", null, value);
+		if (county != null) {
+			ContentValues value = new ContentValues();
+			value.put("county_name", county.getCountyName());
+			value.put("county_Code", county.getCountyCode());
+			value.put("city_id", county.getCityId());
+			db.insert("county", null, value);
+		}
 	}
 
 	/*
 	 * 从数据库读取城镇信息
 	 */
-	public List<County> loadCounty() {
-		County county = new County();
+	public List<County> loadCounty(int cityId) {
 		List<County> countiesList = new ArrayList<County>();
-		Cursor cursor = db.query("city", null, null, null, null, null, null);
+		Cursor cursor = db.query("county", null, "city_id = ?",
+				new String[] { String.valueOf(cityId) }, null, null, null);
 		if (cursor.moveToNext()) {
 			do {
+				County county = new County();
 				county.setId(cursor.getInt(cursor.getColumnIndex("id")));
-				county.setCityId(cursor.getInt(cursor.getColumnIndex("city_id")));
+				county.setCityId(cityId);
 				county.setCountyCode(cursor.getString(cursor
 						.getColumnIndex("county_code")));
 				county.setCountyName(cursor.getString(cursor
-						.getColumnIndex("city_name")));
+						.getColumnIndex("county_name")));
+				countiesList.add(county);
 			} while (cursor.moveToNext());
 			if (cursor != null) {
 				cursor.close();
