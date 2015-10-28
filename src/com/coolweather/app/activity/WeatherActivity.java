@@ -1,6 +1,7 @@
 package com.coolweather.app.activity;
 
 import com.coolweather.app.R;
+import com.coolweather.app.service.AutoUpdateService;
 import com.coolweather.app.util.HttpCallbackListener;
 import com.coolweather.app.util.HttpUtil;
 import com.coolweather.app.util.Utility;
@@ -70,7 +71,8 @@ public class WeatherActivity extends Activity implements OnClickListener {
 		weather.setText(pre.getString("weather_desp", ""));
 		weatherInfoLayout.setVisibility(View.VISIBLE);
 		title.setVisibility(View.VISIBLE);
-
+		Intent intent = new Intent(this, AutoUpdateService.class);
+		startService(intent);
 	}
 
 	private void queryWeatherCode(String countyCode) {
