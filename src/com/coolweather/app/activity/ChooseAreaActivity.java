@@ -53,7 +53,7 @@ public class ChooseAreaActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		isFromWeatherActivity = getIntent().getBooleanExtra(
-				"from_weather_activity", false);
+				"from_county_selected_activity", false);
 		SharedPreferences pre = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		if (pre.getBoolean("city_selected", false) && !isFromWeatherActivity) {

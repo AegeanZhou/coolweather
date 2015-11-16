@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -29,6 +30,7 @@ public class WeatherActivity extends Activity implements OnClickListener {
 	private LinearLayout weatherInfoLayout;
 	private Button change;
 	private Button refresh;
+	private String countyCode;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +51,7 @@ public class WeatherActivity extends Activity implements OnClickListener {
 		change.setOnClickListener(this);
 		refresh.setOnClickListener(this);
 
-		String countyCode = getIntent().getStringExtra("county_code");
+		countyCode = getIntent().getStringExtra("county_code");
 		if (!TextUtils.isEmpty(countyCode)) {
 			publish.setText("正在同步中...");
 			weatherInfoLayout.setVisibility(View.INVISIBLE);
@@ -135,8 +137,15 @@ public class WeatherActivity extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.change:
-			Intent intent = new Intent(this, ChooseAreaActivity.class);
+			// Intent intent = new Intent(this, ChooseAreaActivity.class);
+
+			SharedPreferences pre1 = PreferenceManager
+					.getDefaultSharedPreferences(this);
+			String cityName = pre1.getString("city_name", "");
+			Intent intent = new Intent(this, CountySelectedActivity.class);
 			intent.putExtra("from_weather_activity", true);
+			intent.putExtra("cityName", cityName);
+			Log.i("cityname", cityName);
 			startActivity(intent);
 			finish();
 			break;

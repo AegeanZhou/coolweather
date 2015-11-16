@@ -6,31 +6,30 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class CoolWeatherOpenHelper extends SQLiteOpenHelper {
-/*
- * province建表语句
- */
-	public static final String CREATE_PROVINCE = "create table province(" +
-			"id integer primary key autoincrement," +
-			"province_name text," +
-			"province_code text)";
+	/*
+	 * province建表语句
+	 */
+	public static final String CREATE_PROVINCE = "create table province("
+			+ "id integer primary key autoincrement," + "province_name text,"
+			+ "province_code text)";
 	/*
 	 * city建表语句
 	 */
-	
-	public static final String CREATE_CITY = "create table city(" +
-			"id integer primary key autoincrement," +
-			"city_name text," +
-			"city_code text," +
-			"province_id integer)";
+
+	public static final String CREATE_CITY = "create table city("
+			+ "id integer primary key autoincrement," + "city_name text,"
+			+ "city_code text," + "province_id integer)";
 	/*
 	 * county建表语句
 	 */
-	
-	public static final String CREATE_COUNTY = "create table county(" +
-			"id integer primary key autoincrement," +
-			"county_name text," +
-			"county_code text," +
-			"city_id integer)";
+
+	public static final String CREATE_COUNTY = "create table county("
+			+ "id integer primary key autoincrement," + "county_name text,"
+			+ "county_code text," + "city_id integer)";
+
+	public static final String CREATE_SELECTED = "create table selected("
+			+ "id integer primary key autoincrement," + "county_name text,"
+			+ "county_code text)";
 
 	public CoolWeatherOpenHelper(Context context, String name,
 			CursorFactory factory, int version) {
@@ -39,15 +38,21 @@ public class CoolWeatherOpenHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		db.execSQL(CREATE_PROVINCE);//建立province表
-		db.execSQL(CREATE_CITY);//建立city表
-		db.execSQL(CREATE_COUNTY);//建立county表
+		db.execSQL(CREATE_PROVINCE);// 建立province表
+		db.execSQL(CREATE_CITY);// 建立city表
+		db.execSQL(CREATE_COUNTY);// 建立county表
+		db.execSQL(CREATE_SELECTED);// 建立selected表
 
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// TODO Auto-generated method stub
+		switch (oldVersion) {
+		case 1:
+			db.execSQL(CREATE_SELECTED);
+
+		default:
+		}
 
 	}
 

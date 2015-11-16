@@ -11,12 +11,12 @@
 
         <Button
             android:id="@+id/change"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:background="#fff"
-            android:text="change" />
+            android:layout_marginLeft="20dp"
+            android:background="@drawable/main"
+            />
 
         <TextView
             android:id="@+id/title"
@@ -28,12 +28,13 @@
 
         <Button
             android:id="@+id/refresh"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:background="#fff"
-            android:text="refresh" />
+            android:layout_marginRight="20dp"
+            android:layout_alignTop="@+id/title"
+            android:background="@drawable/refresh" />
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -47,7 +48,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:textSize="18sp" />
+            android:layout_margin="15dp"
+            android:textSize="16sp" />
 
         <LinearLayout
             android:id="@+id/weather_info_layout"

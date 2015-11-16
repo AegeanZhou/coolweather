@@ -7,12 +7,13 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.coolweather.app.db.CoolWeatherOpenHelper;
 
 public class CoolWeatherDB {
 	private String DBName = "CoolWeatherDB";
-	public static final int VERSION = 1;
+	public static final int VERSION = 2;
 	private static CoolWeatherDB coolWeatherDB;
 	private SQLiteDatabase db;
 
@@ -87,6 +88,33 @@ public class CoolWeatherDB {
 	}
 
 	/*
+	 * 根据county_code查询countyName
+	 */
+	public County queryCounty(String county_name) {
+		County county = new County();
+		if (county_name != null) {
+			Cursor cur = db.query("county", null, "county_name = ?",
+					new String[] { county_name }, null, null, null);
+			if (cur.moveToFirst()) {
+				do {
+					county.setCountyName(cur.getString(cur
+							.getColumnIndex("county_name")));
+					county.setCountyCode(cur.getString(cur
+							.getColumnIndex("county_code")));
+
+					Log.i("coolweather",
+							county.getCountyCode() + county.getCountyName());
+
+				} while (cur.moveToNext());
+				if (cur != null) {
+					cur.close();
+				}
+			}
+		}
+		return county;
+	}
+
+	/*
 	 * 从数据库读取城市信息
 	 */
 
@@ -133,7 +161,7 @@ public class CoolWeatherDB {
 		List<County> countiesList = new ArrayList<County>();
 		Cursor cursor = db.query("county", null, "city_id = ?",
 				new String[] { String.valueOf(cityId) }, null, null, null);
-		if (cursor.moveToNext()) {
+		if (cursor.moveToFirst()) {
 			do {
 				County county = new County();
 				county.setId(cursor.getInt(cursor.getColumnIndex("id")));
@@ -150,5 +178,63 @@ public class CoolWeatherDB {
 		}
 		return countiesList;
 
+	}
+
+	/*
+	 * 
+	 * County county = new County(); if (county_name != null) { Cursor cur =
+	 * db.query("county", null, "county_name = ?", new String[] { county_name },
+	 * null, null, null); if (cur.moveToFirst()) { do {
+	 */
+
+	public void saveSelectedCounty(County county) {
+
+		Log.i("coolWeather saveSelectedCounty", county.getCountyName());
+
+		if (county != null) {
+			Cursor cur = db.query("selected", null, "county_name=?",
+					new String[] { county.getCountyName() }, null, null, null);
+
+			Log.i("coolWeather 2", county.getCountyCode() + cur.moveToFirst());
+
+			if (cur.moveToFirst() == false) {
+
+				ContentValues value = new ContentValues();
+				value.put("county_name", county.getCountyName());
+				value.put("county_code", county.getCountyCode());
+				db.insert("selected", null, value);
+				if (cur != null) {
+					cur.close();
+				}
+			}
+
+		}
+	}
+
+	public void delSelectedCounty(String name) {
+		if (name != null) {
+			db.delete("selected", "county_name=?", new String[] { name });
+		}
+	}
+
+	public List<County> loadSelected() {
+		List<County> selectedList = new ArrayList<County>();
+		Cursor cursor = db
+				.query("selected", null, null, null, null, null, null);
+		if (cursor.moveToFirst()) {
+			do {
+				County county = new County();
+				county.setId(cursor.getInt(cursor.getColumnIndex("id")));
+				county.setCountyCode(cursor.getString(cursor
+						.getColumnIndex("county_code")));
+				county.setCountyName(cursor.getString(cursor
+						.getColumnIndex("county_name")));
+				selectedList.add(county);
+			} while (cursor.moveToNext());
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
+		return selectedList;
 	}
 }
