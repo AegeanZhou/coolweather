@@ -52,6 +52,7 @@ public class ChooseAreaActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		isFromWeatherActivity = getIntent().getBooleanExtra(
 				"from_county_selected_activity", false);
 		SharedPreferences pre = PreferenceManager
