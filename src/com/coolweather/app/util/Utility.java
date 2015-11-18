@@ -84,6 +84,31 @@ public class Utility {
 
 	}
 
+	public static void handleWeatherResponseTwo(Context context, String response) {
+		try {
+			JSONObject object = new JSONObject(response);
+			JSONObject info = object.getJSONObject("weatherinfo");
+			String tempNow = info.getString("temp");
+			String wind = info.getString("WD");
+			String windLevel = info.getString("WS");
+			saveNewWeatherInfo(context, tempNow, wind, windLevel);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private static void saveNewWeatherInfo(Context context, String tempNow,
+			String wind, String windLevel) {
+		SharedPreferences.Editor editor = PreferenceManager
+				.getDefaultSharedPreferences(context).edit();
+		editor.putString("temp_now", tempNow);
+		editor.putString("wind", wind);
+		editor.putString("wind_level", windLevel);
+		editor.commit();
+
+	}
+
 	public static void handleWeatherResponse(Context context, String response) {
 		try {
 			JSONObject json = new JSONObject(response);
@@ -116,6 +141,7 @@ public class Utility {
 		editor.putString("weather_code", weatherCode);
 		editor.putString("weather_desp", weatherDesp);
 		editor.putString("current_time", sdf.format(new Date()));
+
 		editor.commit();
 
 	}

@@ -32,8 +32,12 @@ public class WeatherActivity extends Activity implements OnClickListener {
 	private Button change;
 	private Button refresh;
 	private String countyCode;
-	private ImageView image;
+	private ImageView weaIcon;
 	private int weather_icon = 0;
+	private TextView tempNow;
+	private TextView wind;
+	private TextView windLevel;
+	private ImageView verImg;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +52,12 @@ public class WeatherActivity extends Activity implements OnClickListener {
 		temp1 = (TextView) findViewById(R.id.temp1);
 		temp2 = (TextView) findViewById(R.id.temp2);
 		weather = (TextView) findViewById(R.id.weather);
+		tempNow = (TextView) findViewById(R.id.temp_now);
+		wind = (TextView) findViewById(R.id.wind);
+		windLevel = (TextView) findViewById(R.id.wind_level);
+		verImg = (ImageView) findViewById(R.id.ver);
 
-		image = (ImageView) findViewById(R.id.weather_icon);
+		weaIcon = (ImageView) findViewById(R.id.weather_icon);
 
 		change = (Button) findViewById(R.id.change);
 		refresh = (Button) findViewById(R.id.refresh);
@@ -61,10 +69,25 @@ public class WeatherActivity extends Activity implements OnClickListener {
 			publish.setText("正在同步中...");
 			weatherInfoLayout.setVisibility(View.INVISIBLE);
 			title.setVisibility(View.INVISIBLE);
+			weaIcon.setVisibility(View.INVISIBLE);
+			verImg.setVisibility(View.INVISIBLE);
 			queryWeatherCode(countyCode);
 		} else {
 			showWeather();
+			showWeatherTwo();
 		}
+	}
+
+	private void showWeatherTwo() {
+		SharedPreferences pre = PreferenceManager
+				.getDefaultSharedPreferences(WeatherActivity.this);
+		tempNow.setText(pre.getString("temp_now", "") + "°");
+		wind.setText(pre.getString("wind", ""));
+		windLevel.setText(pre.getString("wind_level", ""));
+		verImg.setVisibility(View.VISIBLE);
+		Intent intent = new Intent(this, AutoUpdateService.class);
+		startService(intent);
+
 	}
 
 	private int getWeatherIcon(String weatherInfo) {
@@ -108,10 +131,10 @@ public class WeatherActivity extends Activity implements OnClickListener {
 		weather.setText(pre.getString("weather_desp", ""));
 		weatherInfoLayout.setVisibility(View.VISIBLE);
 		title.setVisibility(View.VISIBLE);
-
+		weaIcon.setVisibility(View.VISIBLE);
 		String info = pre.getString("weather_desp", "");
 		weather_icon = getWeatherIcon(info);
-		image.setImageResource(weather_icon);
+		weaIcon.setImageResource(weather_icon);
 
 		Intent intent = new Intent(this, AutoUpdateService.class);
 		startService(intent);
@@ -126,7 +149,10 @@ public class WeatherActivity extends Activity implements OnClickListener {
 	private void queryWeather(String weatherCode) {
 		String address = "http://www.weather.com.cn/data/cityinfo/"
 				+ weatherCode + ".html";
+		String anotherAddress = "http://www.weather.com.cn/data/sk/"
+				+ weatherCode + ".html";
 		queryFromServer(address, "weatherCode");
+		queryFromServer(anotherAddress, "weatherCodeToo");
 	}
 
 	private void queryFromServer(final String address, final String type) {
@@ -153,6 +179,17 @@ public class WeatherActivity extends Activity implements OnClickListener {
 						}
 					});
 
+				} else if ("weatherCodeToo".equals(type)) {
+					Utility.handleWeatherResponseTwo(WeatherActivity.this,
+							response);
+					runOnUiThread(new Runnable() {
+
+						@Override
+						public void run() {
+							showWeatherTwo();
+
+						}
+					});
 				}
 
 			}
