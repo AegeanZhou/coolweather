@@ -240,4 +240,12 @@ public class WeatherActivity extends Activity implements OnClickListener {
 		}
 
 	}
+
+//	@Override
+//	public void onBackPressed() {
+//		if (getIntent().getFlags() == 0) {
+//			finish();
+//		}
+////		super.onBackPressed();
+//	}
 }

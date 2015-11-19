@@ -33,6 +33,7 @@ public class CountySelectedActivity extends Activity implements OnClickListener 
 	private List<String> dataList = new ArrayList<String>();
 	private CoolWeatherDB coolWeatherDB;
 	private ArrayAdapter<String> adapter;
+	private int flag = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -138,6 +139,24 @@ public class CountySelectedActivity extends Activity implements OnClickListener 
 			break;
 		}
 
+	}
+
+	@Override
+	protected void onResume() {
+		flag++;
+		for (int i = 1; i < flag; i++)
+			finish();
+		Log.i("flag", flag + "");
+		super.onResume();
+	}
+
+	@Override
+	public void onBackPressed() {
+		Intent intent = new Intent(this, WeatherActivity.class);
+//		intent.addFlags(flag);
+		startActivity(intent);
+		finish();
+		// super.onBackPressed();
 	}
 
 }
