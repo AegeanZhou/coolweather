@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class ChooseAreaActivity extends BaseActivity {
+	//当前选择界面的level：省级、市级、县级
 	private static final int LEVEL_PROVINCE = 0;
 	private static final int LEVEL_CITY = 1;
 	private static final int LEVEL_COUNTY = 2;
@@ -51,8 +52,6 @@ public class ChooseAreaActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.choose_area);
 		title = (TextView) findViewById(R.id.title);
@@ -78,7 +77,6 @@ public class ChooseAreaActivity extends BaseActivity {
 
 					Intent intent = new Intent(ChooseAreaActivity.this,
 							WeatherShowActivity.class);
-
 					String weaid = "";
 					List<Area> areaList = coolWeatherDB.loadArea();
 					for (Area area : areaList) {

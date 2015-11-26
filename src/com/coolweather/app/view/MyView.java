@@ -38,17 +38,17 @@ public class MyView extends View {
 		int width = wm.getDefaultDisplay().getWidth();
 
 		if (list.size() > 0) {
+			// 要绘制的点的坐标
 			for (int i = 0; i < list.size(); i++) {
 				String[] temp = list.get(i).split("#");
 				int high = Integer.parseInt(temp[0]);
 				int low = Integer.parseInt(temp[1]);
-				Log.i("width", width/7+"");
-				path.lineTo(width / 7 * (i + 1)-80, (-high) * 2 + 75);
-				path.addCircle(width / 7 * (i + 1) -80,
-						(-high) * 2 + 75, 5, Direction.CW);
-				pathl.lineTo(width / 7 * (i + 1)-80, (-low) * 2 + 70);
-				pathl.addCircle(width / 7 * (i + 1) -80,
-						(-low) * 2 + 70, 5, Direction.CW);
+				path.lineTo(width / 7 * (i + 1) - 80, (-high) * 2 + 75);
+				path.addCircle(width / 7 * (i + 1) - 80, (-high) * 2 + 75, 5,
+						Direction.CW);
+				pathl.lineTo(width / 7 * (i + 1) - 80, (-low) * 2 + 70);
+				pathl.addCircle(width / 7 * (i + 1) - 80, (-low) * 2 + 70, 5,
+						Direction.CW);
 			}
 			path.lineTo(width, 20);
 			pathl.lineTo(width, 10);
@@ -69,16 +69,6 @@ public class MyView extends View {
 		canvas.drawPath(path, paint);
 		canvas.translate(0, 60);
 		canvas.drawPath(pathl, paint);
-	}
-
-	public int sp2px(Context context, float spValue) {
-		final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
-		return (int) (spValue * fontScale + 0.5f);
-	}
-
-	public int dip2px(Context context, float dpValue) {
-		final float scale = context.getResources().getDisplayMetrics().density;
-		return (int) (dpValue * scale + 0.5f);
 	}
 
 }

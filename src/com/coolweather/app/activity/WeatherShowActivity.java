@@ -8,6 +8,7 @@ import java.util.Locale;
 import com.coolweather.app.R;
 import com.coolweather.app.Adapter.ImageAdapter;
 import com.coolweather.app.model.ImageEntity;
+import com.coolweather.app.service.AutoUpdateService;
 import com.coolweather.app.util.HttpCallbackListener;
 import com.coolweather.app.util.HttpUtil;
 import com.coolweather.app.util.Utility;
@@ -94,28 +95,36 @@ public class WeatherShowActivity extends BaseActivity implements
 		windLevel.setText(pre.getString("winp", ""));
 		weather_icon = getWeatherIcon(pre.getString("weather", ""));
 		weatherIcon.setBackgroundResource(weather_icon);
+
+		// 自定义一个字符串数字，里面的值对应返回的Jason数据里的关键字
 		String[] s = { "0", "1", "2", "3", "4", "5", "6" };
 		for (int i = 0; i < 7; i++) {
 			String key = s[i];
 			String str = pre.getString(key, "");
+
+			// 拆分用"#"作为分隔拼接的字符串
 			String[] res = str.split("#");
-			Log.i("weatherShow", str + "str");
+			// Log.i("weatherShow", str + "str");
 			pos.add(str);
 			// url.add(res[2]);
 			imagesUrl[i] = res[2];
 			weather_p[i] = res[3];
 			temp_p[i] = res[4];
 		}
-
+		// 绘制气温曲线图层
 		LinearLayout rootLayout = (LinearLayout) findViewById(R.id.bottom);
 		final MyView draw = new MyView(this, pos);
 		draw.setMinimumHeight(500);
 		draw.setMinimumWidth(300);
 		rootLayout.setBackgroundColor(color.transparent);
 		rootLayout.addView(draw);
+		// 通过service设置自动更新天气
+		Intent intent = new Intent(this, AutoUpdateService.class);
+		startService(intent);
 
 	}
 
+	// 添加近七日天气图标
 	public void addImage() {
 		for (int i = 0; i < imagesUrl.length; i++) {
 			ImageEntity b = new ImageEntity();
@@ -132,6 +141,7 @@ public class WeatherShowActivity extends BaseActivity implements
 		new ImageLoadTask(getApplicationContext(), adapter).execute(imagesUrl);
 	}
 
+	// 用AsyncTask实现异步加载网络图片，并最终显示到UI
 	public class ImageLoadTask extends AsyncTask<String, Void, Void> {
 		private ImageAdapter adapter;
 
@@ -143,7 +153,6 @@ public class WeatherShowActivity extends BaseActivity implements
 		@Override
 		protected Void doInBackground(String... params) {
 
-			String p2 = params[1];
 			for (int i = 0; i < adapter.getCount(); i++) {
 				String url = params[i];
 				ImageEntity bean = (ImageEntity) adapter.getItem(i);
@@ -201,6 +210,7 @@ public class WeatherShowActivity extends BaseActivity implements
 		});
 	}
 
+	// 初始化控件
 	private void init() {
 		weatherIcon = (ImageView) findViewById(R.id.wea_icon);
 		weatherText = (TextView) findViewById(R.id.weather_text);
@@ -217,6 +227,7 @@ public class WeatherShowActivity extends BaseActivity implements
 		refreshBtn.setOnClickListener(this);
 	}
 
+	// 获取天气图标
 	private int getWeatherIcon(String weatherInfo) {
 		if (weatherInfo.equals("晴") || weatherInfo.contains("晴")) {
 			return R.drawable.w00;

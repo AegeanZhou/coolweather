@@ -26,7 +26,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
-public class AreaSelectedActivity extends BaseActivity implements OnClickListener {
+public class AreaSelectedActivity extends BaseActivity implements
+		OnClickListener {
 	private Button add;
 	private Button back;
 	private ListView selectedList;
@@ -51,10 +52,11 @@ public class AreaSelectedActivity extends BaseActivity implements OnClickListene
 		list = new ArrayList<County>();
 		String citynm = getIntent().getStringExtra("citynm");
 		County county = coolWeatherDB.queryCounty(citynm);
+
+		// 判断activity是否由点击add按钮后跳转过来的。是，则添加到数据库；不是，则不执行添加操作
 		if (getIntent().getBooleanExtra("add", false)) {
 			coolWeatherDB.saveSelectedCounty(county);
 		}
-
 		list = coolWeatherDB.loadSelected();
 
 		adapter = new ArrayAdapter<String>(this,
@@ -145,12 +147,15 @@ public class AreaSelectedActivity extends BaseActivity implements OnClickListene
 			break;
 		case R.id.add:
 			Intent intent = new Intent(this, ChooseAreaActivity.class);
-			// intent.putExtra("add", true);
 			startActivity(intent);
 			break;
 		}
 
 	}
+
+	/*
+	 * 重写返回键按钮点击跳转到ChooseWhereActivity界面
+	 */
 	@Override
 	public void onBackPressed() {
 		Intent intent = new Intent(AreaSelectedActivity.this,

@@ -36,15 +36,13 @@ import android.widget.TextView;
 
 public class ChooseWhereActivity extends BaseActivity {
 	private SearchView search;
-	private ProgressDialog progressDialog;
 	private CoolWeatherDB coolWeatherDB;
 	private List<Area> areaList;
 	private GridView grid;
-	private TextView textBtn;
-	String[] id = { "1", "36", "165", "169", "147", "446", "209", "222", "219",
-			"399", "248", "425" };
-	String[] cityNm = { "北京", "上海", "广州", "深圳", "厦门", "大连", "昆明", "丽江", "大理",
-			"南京", "武汉", "长春" };
+	private static String[] id = { "1", "36", "165", "169", "147", "446",
+			"209", "222", "219", "399", "248", "425" };
+	private static String[] cityNm = { "北京", "上海", "广州", "深圳", "厦门", "大连",
+			"昆明", "丽江", "大理", "南京", "武汉", "长春" };
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -88,13 +86,13 @@ public class ChooseWhereActivity extends BaseActivity {
 
 		});
 
+		// 热门城市用gridview显示，用map<String，object>来存储信息
 		List<Map<String, Object>> listItems = new ArrayList<Map<String, Object>>();
 		for (int i = 0; i < cityNm.length; i++) {
 			Map<String, Object> listItem = new HashMap<String, Object>();
 			listItem.put("city", cityNm[i]);
 			listItems.add(listItem);
 		}
-		textBtn = (TextView) findViewById(R.id.choose);
 		SimpleAdapter adapter = new SimpleAdapter(this, listItems,
 				R.layout.cell, new String[] { "city" },
 				new int[] { R.id.choose });
@@ -128,7 +126,8 @@ public class ChooseWhereActivity extends BaseActivity {
 			queryAreaFromServer(name);
 		}
 
-		Log.i("input", name + "**" + weaid + ")))" + areaList.size() + "&&&");
+		// Log.i("input", name + "**" + weaid + ")))" + areaList.size() +
+		// "&&&");
 		return weaid;
 
 	}
@@ -153,37 +152,16 @@ public class ChooseWhereActivity extends BaseActivity {
 
 	}
 
-	private void closeProgressDialog() {
-		if (progressDialog != null) {
-			progressDialog.dismiss();
-		}
-
-	}
-
-	private void showProgressDialog() {
-		if (progressDialog != null) {
-			progressDialog = new ProgressDialog(this);
-			progressDialog.setTitle("正在加载中...");
-			progressDialog.setCancelable(false);
-			progressDialog.show();
-		}
-
-	}
-
 	@Override
 	public void onBackPressed() {
-		// Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
-//		ActivityCollector.finishAll();
 		exitDialog();
-//		super.onBackPressed();
 	}
 
+	// 退出前弹出确认对话框
 	private void exitDialog() {
 		// TODO Auto-generated method stub
 		AlertDialog.Builder builder = new Builder(this);
-//		builder.setTitle("确认对话框");
 		builder.setMessage("是否退出程序");
-//		builder.setIcon(R.drawable.ic_launcher);
 		builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
 
 			@Override

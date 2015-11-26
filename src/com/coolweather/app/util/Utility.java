@@ -89,68 +89,7 @@ public class Utility {
 
 	}
 
-	public static void handleWeatherResponseTwo(Context context, String response) {
-		try {
-			JSONObject object = new JSONObject(response);
-			JSONObject info = object.getJSONObject("weatherinfo");
-			String tempNow = info.getString("temp");
-			String wind = info.getString("WD");
-			String windLevel = info.getString("WS");
-			saveNewWeatherInfo(context, tempNow, wind, windLevel);
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	private static void saveNewWeatherInfo(Context context, String tempNow,
-			String wind, String windLevel) {
-		SharedPreferences.Editor editor = PreferenceManager
-				.getDefaultSharedPreferences(context).edit();
-		editor.putString("temp_now", tempNow);
-		editor.putString("wind", wind);
-		editor.putString("wind_level", windLevel);
-		editor.commit();
-
-	}
-
-	public static void handleWeatherResponse(Context context, String response) {
-		try {
-			JSONObject json = new JSONObject(response);
-			JSONObject weatherinfo = json.getJSONObject("weatherinfo");
-			String cityName = weatherinfo.getString("city");
-			String weatherCode = weatherinfo.getString("cityid");
-			String temp1 = weatherinfo.getString("temp1");
-			String temp2 = weatherinfo.getString("temp2");
-			String publishTime = weatherinfo.getString("ptime");
-			String weatherDesp = weatherinfo.getString("weather");
-			saveWeatherInfo(context, cityName, weatherCode, temp1, temp2,
-					publishTime, weatherDesp);
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	private static void saveWeatherInfo(Context context, String cityName,
-			String weatherCode, String temp1, String temp2, String publishTime,
-			String weatherDesp) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy年m月d日", Locale.CHINA);
-		SharedPreferences.Editor editor = PreferenceManager
-				.getDefaultSharedPreferences(context).edit();
-		editor.putBoolean("city_selected", true);
-		editor.putString("city_name", cityName);
-		editor.putString("publish_time", publishTime);
-		editor.putString("temp1", temp1);
-		editor.putString("temp2", temp2);
-		editor.putString("weather_code", weatherCode);
-		editor.putString("weather_desp", weatherDesp);
-		editor.putString("current_time", sdf.format(new Date()));
-
-		editor.commit();
-
-	}
-
+	// 解析返回的Jason数据
 	public static void handleWeatherResponseT(Context context, String response) {
 		List<String> list = new ArrayList<String>();
 
@@ -167,6 +106,7 @@ public class Utility {
 				String weather = obj.getString("weather");
 				String wind = obj.getString("wind");
 				String winp = obj.getString("winp");
+				String weaid = obj.getString("weaid");
 
 				for (int i = 0; i < array.length(); i++) {
 					obj = array.getJSONObject(i);
@@ -176,17 +116,17 @@ public class Utility {
 					String high_temp = obj.getString("temp_high");
 					String low_temp = obj.getString("temp_low");
 					String date = high_temp + "#" + low_temp + "#"
-							+ weather_icon + "#" + days + "#"
-							+ temperature;
-//					Log.i("utility", date);
+							+ weather_icon + "#" + days + "#" + temperature;
+					// Log.i("utility", date);
 					list.add(date);
 				}
 
-				saveWeatherInf(context, tempNow, weather, wind, winp, list);
+				saveWeatherInf(context, weaid, tempNow, weather, wind, winp,
+						list);
 			} else {
 				String msg = json.getString("msg");
 				String error = "更新失败...";
-//				Log.i("handleWeatherResponseT", error + msg);
+				// Log.i("handleWeatherResponseT", error + msg);
 			}
 
 		} catch (JSONException e) {
@@ -195,10 +135,13 @@ public class Utility {
 		}
 	}
 
-	private static void saveWeatherInf(Context context, String tempNow,
-			String weather, String wind, String winp, List<String> list) {
+	// 将解析出来的天气信息保存到sharedpreference
+	private static void saveWeatherInf(Context context, String weaid,
+			String tempNow, String weather, String wind, String winp,
+			List<String> list) {
 		SharedPreferences.Editor editor = PreferenceManager
 				.getDefaultSharedPreferences(context).edit();
+		editor.putString("weaid", weaid);
 		editor.putString("tempNow", tempNow);
 		editor.putString("weather", weather);
 		editor.putString("wind", wind);
@@ -209,17 +152,11 @@ public class Utility {
 			editor.putString(key, list.get(i));
 		}
 
-//		Log.i("handleWeatherResponseT", "tempNow" + tempNow + "weather"
-//				+ weather);
-		for (int i = 0; i < list.size(); i++) {
-			Log.i("handleWeatherResponseT", "wind" + wind + "winp" + winp + "*"
-					+ list.get(i));
-		}
-
 		editor.commit();
 
 	}
 
+	// 解析各个地区的citynm对应的weaid并保存到数据库
 	public static boolean handleAreaRequest(CoolWeatherDB coolWeatherDB,
 			String response) {
 		try {
@@ -234,8 +171,6 @@ public class Utility {
 						area.setCitynm(city.getString("citynm"));
 						area.setWeaid(city.getString("weaid"));
 						coolWeatherDB.saveArea(area);
-						// Log.i("Utility", i + "--" + area.getCitynm() + "--"
-						// + area.getWeaid());
 					}
 
 				}
