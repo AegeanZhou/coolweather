@@ -5,6 +5,7 @@ import com.coolweather.app.service.AutoUpdateService;
 import com.coolweather.app.util.HttpCallbackListener;
 import com.coolweather.app.util.HttpUtil;
 import com.coolweather.app.util.Utility;
+import com.coolweather.app.view.MyView;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -22,9 +23,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class WeatherActivity extends Activity implements OnClickListener {
+
 	private TextView title;
 	private TextView publish;
-	// private TextView time;
 	private TextView temp1;
 	private TextView temp2;
 	private TextView weather;
@@ -44,6 +45,7 @@ public class WeatherActivity extends Activity implements OnClickListener {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
+
 		setContentView(R.layout.weather_layout);
 		weatherInfoLayout = (LinearLayout) findViewById(R.id.weather_info_layout);
 		title = (TextView) findViewById(R.id.title);
@@ -76,6 +78,8 @@ public class WeatherActivity extends Activity implements OnClickListener {
 			showWeather();
 			showWeatherTwo();
 		}
+
+		
 	}
 
 	private void showWeatherTwo() {
@@ -90,35 +94,35 @@ public class WeatherActivity extends Activity implements OnClickListener {
 
 	}
 
-	private int getWeatherIcon(String weatherInfo) {
-		if (weatherInfo.equals("«Á")) {
-			return R.drawable.weathericon_condition_01;
-		} else if (weatherInfo.equals("∂‡‘∆")) {
-			return R.drawable.weathericon_condition_02;
-		} else if (weatherInfo.equals("“ı")) {
-			return R.drawable.weathericon_condition_04;
-		} else if (weatherInfo.equals("ŒÌ")) {
-			return R.drawable.weathericon_condition_05;
-		} else if (weatherInfo.equals("…≥≥æ±©")) {
-			return R.drawable.weathericon_condition_06;
-		} else if (weatherInfo.equals("’Û”Í")) {
-			return R.drawable.weathericon_condition_07;
-		} else if (weatherInfo.equals("–°”Í") || weather.equals("–°µΩ÷–”Í")) {
-			return R.drawable.weathericon_condition_08;
-		} else if (weatherInfo.equals("¥Û”Í")) {
-			return R.drawable.weathericon_condition_09;
-		} else if (weatherInfo.equals("¿◊’Û”Í")) {
-			return R.drawable.weathericon_condition_10;
-		} else if (weatherInfo.equals("–°—©")) {
-			return R.drawable.weathericon_condition_11;
-		} else if (weatherInfo.equals("¥Û—©")) {
-			return R.drawable.weathericon_condition_12;
-		} else if (weatherInfo.equals("”Íº–—©")) {
-			return R.drawable.weathericon_condition_13;
-		} else {
-			return R.drawable.weathericon_condition_17;
-		}
-	}
+//	private int getWeatherIcon(String weatherInfo) {
+//		if (weatherInfo.equals("«Á")) {
+//			return R.drawable.weathericon_condition_01;
+//		} else if (weatherInfo.equals("∂‡‘∆")) {
+//			return R.drawable.weathericon_condition_02;
+//		} else if (weatherInfo.equals("“ı")) {
+//			return R.drawable.weathericon_condition_04;
+//		} else if (weatherInfo.equals("ŒÌ")) {
+//			return R.drawable.weathericon_condition_05;
+//		} else if (weatherInfo.equals("…≥≥æ±©")) {
+//			return R.drawable.weathericon_condition_06;
+//		} else if (weatherInfo.equals("’Û”Í")) {
+//			return R.drawable.weathericon_condition_07;
+//		} else if (weatherInfo.equals("–°”Í") || weather.equals("–°µΩ÷–”Í")) {
+//			return R.drawable.weathericon_condition_08;
+//		} else if (weatherInfo.equals("¥Û”Í")) {
+//			return R.drawable.weathericon_condition_09;
+//		} else if (weatherInfo.equals("¿◊’Û”Í")) {
+//			return R.drawable.weathericon_condition_10;
+//		} else if (weatherInfo.equals("–°—©")) {
+//			return R.drawable.weathericon_condition_11;
+//		} else if (weatherInfo.equals("¥Û—©")) {
+//			return R.drawable.weathericon_condition_12;
+//		} else if (weatherInfo.equals("”Íº–—©")) {
+//			return R.drawable.weathericon_condition_13;
+//		} else {
+//			return R.drawable.weathericon_condition_17;
+//		}
+//	}
 
 	private void showWeather() {
 		SharedPreferences pre = PreferenceManager
@@ -133,8 +137,8 @@ public class WeatherActivity extends Activity implements OnClickListener {
 		title.setVisibility(View.VISIBLE);
 		weaIcon.setVisibility(View.VISIBLE);
 		String info = pre.getString("weather_desp", "");
-		weather_icon = getWeatherIcon(info);
-		weaIcon.setImageResource(weather_icon);
+//		weather_icon = getWeatherIcon(info);
+//		weaIcon.setImageResource(weather_icon);
 
 		Intent intent = new Intent(this, AutoUpdateService.class);
 		startService(intent);
@@ -154,6 +158,9 @@ public class WeatherActivity extends Activity implements OnClickListener {
 		queryFromServer(address, "weatherCode");
 		queryFromServer(anotherAddress, "weatherCodeToo");
 	}
+
+
+	
 
 	private void queryFromServer(final String address, final String type) {
 		HttpUtil.sendHttpRequest(address, new HttpCallbackListener() {
@@ -241,11 +248,11 @@ public class WeatherActivity extends Activity implements OnClickListener {
 
 	}
 
-//	@Override
-//	public void onBackPressed() {
-//		if (getIntent().getFlags() == 0) {
-//			finish();
-//		}
-////		super.onBackPressed();
-//	}
+	// @Override
+	// public void onBackPressed() {
+	// if (getIntent().getFlags() == 0) {
+	// finish();
+	// }
+	// // super.onBackPressed();
+	// }
 }

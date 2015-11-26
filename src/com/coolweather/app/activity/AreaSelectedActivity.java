@@ -26,7 +26,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
-public class CountySelectedActivity extends BaseActivity implements OnClickListener {
+public class AreaSelectedActivity extends BaseActivity implements OnClickListener {
 	private Button add;
 	private Button back;
 	private ListView selectedList;
@@ -34,7 +34,6 @@ public class CountySelectedActivity extends BaseActivity implements OnClickListe
 	private List<String> dataList = new ArrayList<String>();
 	private CoolWeatherDB coolWeatherDB;
 	private ArrayAdapter<String> adapter;
-	private int flag = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,14 +49,13 @@ public class CountySelectedActivity extends BaseActivity implements OnClickListe
 		selectedList = (ListView) findViewById(R.id.selected);
 
 		list = new ArrayList<County>();
-		
-		
-		String cityName = getIntent().getStringExtra("citynm");
-		County county = coolWeatherDB.queryCounty(cityName);
-		coolWeatherDB.saveSelectedCounty(county);
-		list = coolWeatherDB.loadSelected();
+		String citynm = getIntent().getStringExtra("citynm");
+		County county = coolWeatherDB.queryCounty(citynm);
+		if (getIntent().getBooleanExtra("add", false)) {
+			coolWeatherDB.saveSelectedCounty(county);
+		}
 
-		Log.i("countySelected", list.size() + "");
+		list = coolWeatherDB.loadSelected();
 
 		adapter = new ArrayAdapter<String>(this,
 				android.R.layout.simple_list_item_1, dataList);
@@ -79,9 +77,10 @@ public class CountySelectedActivity extends BaseActivity implements OnClickListe
 					}
 				}
 
-				Intent intent = new Intent(CountySelectedActivity.this,
+				Intent intent = new Intent(AreaSelectedActivity.this,
 						WeatherShowActivity.class);
 				intent.putExtra("weaid", weaid);
+				intent.putExtra("citynm", name);
 				startActivity(intent);
 
 			}
@@ -125,8 +124,14 @@ public class CountySelectedActivity extends BaseActivity implements OnClickListe
 	private void querySelected() {
 		for (County c : list) {
 			String selected = c.getCountyName();
-			dataList.add(selected);
-			Log.i("querySelected", selected);
+			if (selected != null) {
+				dataList.add(selected);
+			} else {
+				int id = c.getId();
+				// Log.i("getid", id + "");
+				coolWeatherDB.delSelectedCounty(id);
+			}
+			// Log.i("querySelected", dataList.size() + "");
 		}
 		adapter.notifyDataSetChanged();
 	}
@@ -140,29 +145,18 @@ public class CountySelectedActivity extends BaseActivity implements OnClickListe
 			break;
 		case R.id.add:
 			Intent intent = new Intent(this, ChooseAreaActivity.class);
-			intent.putExtra("add", true);
+			// intent.putExtra("add", true);
 			startActivity(intent);
 			break;
 		}
 
 	}
-
-	@Override
-	protected void onResume() {
-		flag++;
-		for (int i = 1; i < flag; i++)
-			finish();
-		Log.i("flag", flag + "");
-		super.onResume();
-	}
-
 	@Override
 	public void onBackPressed() {
-		Intent intent = new Intent(this, WeatherActivity.class);
-		// intent.addFlags(flag);
+		Intent intent = new Intent(AreaSelectedActivity.this,
+				ChooseWhereActivity.class);
 		startActivity(intent);
-		finish();
-		// super.onBackPressed();
+		super.onBackPressed();
 	}
 
 }

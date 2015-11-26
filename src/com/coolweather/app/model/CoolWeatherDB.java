@@ -13,7 +13,7 @@ import com.coolweather.app.db.CoolWeatherOpenHelper;
 
 public class CoolWeatherDB {
 	private String DBName = "CoolWeatherDB";
-	public static final int VERSION = 2;
+	public static final int VERSION = 5;
 	private static CoolWeatherDB coolWeatherDB;
 	private SQLiteDatabase db;
 
@@ -93,12 +93,12 @@ public class CoolWeatherDB {
 	public County queryCounty(String county_name) {
 		County county = new County();
 		if (county_name != null) {
+			Log.i("coolweather", county_name);
 			Cursor cur = db.query("county", null, "county_name = ?",
 					new String[] { county_name }, null, null, null);
 			if (cur.moveToFirst()) {
 				do {
-					county.setCountyName(cur.getString(cur
-							.getColumnIndex("county_name")));
+					county.setCountyName(county_name);
 					county.setCountyCode(cur.getString(cur
 							.getColumnIndex("county_code")));
 
@@ -111,6 +111,7 @@ public class CoolWeatherDB {
 				}
 			}
 		}
+		Log.i("coolweather", county.getCountyCode() + county.getCountyName());
 		return county;
 	}
 
@@ -148,7 +149,7 @@ public class CoolWeatherDB {
 		if (county != null) {
 			ContentValues value = new ContentValues();
 			value.put("county_name", county.getCountyName());
-			value.put("county_Code", county.getCountyCode());
+			value.put("county_code", county.getCountyCode());
 			value.put("city_id", county.getCityId());
 			db.insert("county", null, value);
 		}
@@ -189,24 +190,12 @@ public class CoolWeatherDB {
 
 	public void saveSelectedCounty(County county) {
 
-		Log.i("coolWeather saveSelectedCounty", county.getCountyName());
-
 		if (county != null) {
-			Cursor cur = db.query("selected", null, "county_name=?",
-					new String[] { county.getCountyName() }, null, null, null);
+			ContentValues value = new ContentValues();
+			value.put("county_name", county.getCountyName());
+			value.put("county_code", county.getCountyCode());
 
-			Log.i("coolWeather 2", county.getCountyCode() + cur.moveToFirst());
-
-			if (cur.moveToFirst() == false) {
-
-				ContentValues value = new ContentValues();
-				value.put("county_name", county.getCountyName());
-				value.put("county_code", county.getCountyCode());
-				db.insert("selected", null, value);
-				if (cur != null) {
-					cur.close();
-				}
-			}
+			db.replace("selected", null, value);
 
 		}
 	}
@@ -217,6 +206,12 @@ public class CoolWeatherDB {
 		}
 	}
 
+	public void delSelectedCounty(int id) {
+		if (id > 0) {
+			db.delete("selected", "id=?", new String[] { "id" });
+		}
+	}
+
 	public List<County> loadSelected() {
 		List<County> selectedList = new ArrayList<County>();
 		Cursor cursor = db
@@ -224,7 +219,7 @@ public class CoolWeatherDB {
 		if (cursor.moveToFirst()) {
 			do {
 				County county = new County();
-				county.setId(cursor.getInt(cursor.getColumnIndex("id")));
+				// county.setId(cursor.getInt(cursor.getColumnIndex("id")));
 				county.setCountyCode(cursor.getString(cursor
 						.getColumnIndex("county_code")));
 				county.setCountyName(cursor.getString(cursor
@@ -236,5 +231,33 @@ public class CoolWeatherDB {
 			}
 		}
 		return selectedList;
+	}
+
+	public void saveArea(Area area) {
+		if (area != null) {
+			ContentValues value = new ContentValues();
+			value.put("citynm", area.getCitynm());
+			value.put("weaid", area.getWeaid());
+			db.insert("area", null, value);
+		}
+	}
+
+	public List<Area> loadArea() {
+		List<Area> areaList = new ArrayList<Area>();
+		Cursor cursor = db.query("area", null, null, null, null, null, null);
+		if (cursor.moveToFirst()) {
+			do {
+				Area area = new Area();
+				area.setId(cursor.getInt(cursor.getColumnIndex("id")));
+				area.setCitynm(cursor.getString(cursor.getColumnIndex("citynm")));
+				area.setWeaid(cursor.getString(cursor.getColumnIndex("weaid")));
+				areaList.add(area);
+			} while (cursor.moveToNext());
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
+		// db.delete("area", null, null);
+		return areaList;
 	}
 }

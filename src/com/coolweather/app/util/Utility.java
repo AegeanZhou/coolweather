@@ -1,12 +1,16 @@
 package com.coolweather.app.util;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.coolweather.app.model.Area;
 import com.coolweather.app.model.City;
 import com.coolweather.app.model.CoolWeatherDB;
 import com.coolweather.app.model.County;
@@ -16,6 +20,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 public class Utility {
 	/*
@@ -145,4 +150,102 @@ public class Utility {
 		editor.commit();
 
 	}
+
+	public static void handleWeatherResponseT(Context context, String response) {
+		List<String> list = new ArrayList<String>();
+
+		try {
+			JSONObject json = new JSONObject(response);
+			String result = json.getString("success");
+
+			Log.i("handleWeatherResponseT", result);
+
+			if ("1".equals(result)) {
+				JSONArray array = json.getJSONArray("result");
+				JSONObject obj = array.getJSONObject(0);
+				String tempNow = obj.getString("temp_high");
+				String weather = obj.getString("weather");
+				String wind = obj.getString("wind");
+				String winp = obj.getString("winp");
+
+				for (int i = 0; i < array.length(); i++) {
+					obj = array.getJSONObject(i);
+					String temperature = obj.getString("temperature");
+					String days = obj.getString("days");
+					String weather_icon = obj.getString("weather_icon");
+					String high_temp = obj.getString("temp_high");
+					String low_temp = obj.getString("temp_low");
+					String date = high_temp + "#" + low_temp + "#"
+							+ weather_icon + "#" + days + "#"
+							+ temperature;
+//					Log.i("utility", date);
+					list.add(date);
+				}
+
+				saveWeatherInf(context, tempNow, weather, wind, winp, list);
+			} else {
+				String msg = json.getString("msg");
+				String error = "¸üÐÂÊ§°Ü...";
+//				Log.i("handleWeatherResponseT", error + msg);
+			}
+
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private static void saveWeatherInf(Context context, String tempNow,
+			String weather, String wind, String winp, List<String> list) {
+		SharedPreferences.Editor editor = PreferenceManager
+				.getDefaultSharedPreferences(context).edit();
+		editor.putString("tempNow", tempNow);
+		editor.putString("weather", weather);
+		editor.putString("wind", wind);
+		editor.putString("winp", winp);
+		String[] week = { "0", "1", "2", "3", "4", "5", "6" };
+		for (int i = 0; i < list.size(); i++) {
+			String key = week[i];
+			editor.putString(key, list.get(i));
+		}
+
+//		Log.i("handleWeatherResponseT", "tempNow" + tempNow + "weather"
+//				+ weather);
+		for (int i = 0; i < list.size(); i++) {
+			Log.i("handleWeatherResponseT", "wind" + wind + "winp" + winp + "*"
+					+ list.get(i));
+		}
+
+		editor.commit();
+
+	}
+
+	public static boolean handleAreaRequest(CoolWeatherDB coolWeatherDB,
+			String response) {
+		try {
+			JSONObject json = new JSONObject(response);
+			String str = json.getString("success");
+			if ("1".equals(str)) {
+				JSONObject result = json.getJSONObject("result");
+				for (int i = 1; i < 2646; i++) {
+					if (result.has(i + "")) {
+						JSONObject city = result.getJSONObject(i + "");
+						Area area = new Area();
+						area.setCitynm(city.getString("citynm"));
+						area.setWeaid(city.getString("weaid"));
+						coolWeatherDB.saveArea(area);
+						// Log.i("Utility", i + "--" + area.getCitynm() + "--"
+						// + area.getWeaid());
+					}
+
+				}
+				Log.i("length", result.length() + "");
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return true;
+	}
+
 }
